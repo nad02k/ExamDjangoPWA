@@ -1,43 +1,50 @@
 <template>
-  <div id="app">
+  <div id="app" class="app-container">
     <!-- Header -->
-    <header class="app-header">
+    <header class="app-header" role="banner">
       <h1>📚 Offline Asset Manager</h1>
-      <p>Your Progressive Web App is Ready!</p>
+      <p>Your PWA is Ready!</p>
     </header>
 
     <!-- Main Content -->
-    <main class="app-content">
+    <main class="app-content" role="main">
       <!-- Action Buttons -->
       <div class="action-buttons">
         <button v-if="showInstallPrompt" @click="installPWA" class="btn install-btn">📥 Install App</button>
-        <button @click="fetchAssets" class="btn fetch-btn">📦 Load Offline Assets</button>
-        <button @click="subscribeToPush" class="btn notify-btn">🔔 Enable Push Notifications</button>
+        <button @click="fetchAssets" class="btn fetch-btn">📦 Load Cached Assets</button>
+        <PushNotificationButton />
       </div>
 
+      <!-- Loading Spinner -->
+      <div v-if="loading" class="spinner">🔄 Loading assets...</div>
+
       <!-- Asset List -->
-      <section class="asset-list">
-        <h2>Cached Assets</h2>
-        <ul v-if="assets.length">
-          <li v-for="asset in assets" :key="asset.id" class="asset-card">
-            <strong>{{ asset.url }}</strong>
-            <small>Hash: {{ asset.hash.substring(0, 10) }}...</small>
-          </li>
-        </ul>
-        <p v-else class="no-assets">No assets found. Click "Load Offline Assets"</p>
-      </section>
+      <AssetList :assets="assets" />
+
+      <!-- Footer -->
+      <footer class="app-footer" role="contentinfo">
+        <p>&copy; 2025 Offline Asset Manager</p>
+      </footer>
     </main>
   </div>
 </template>
 
 <script>
+import AssetList from './components/AssetList.vue';
+import PushNotificationButton from './components/PushNotificationButton.vue';
+
 export default {
   name: 'App',
+  components: {
+    AssetList,
+    PushNotificationButton
+  },
   data() {
     return {
       assets: [],
       showInstallPrompt: false,
-      deferredPrompt: null
+      deferredPrompt: null,
+      loading: false
     };
   },
   mounted() {
@@ -62,7 +69,7 @@ export default {
         this.deferredPrompt.prompt();
         this.deferredPrompt.userChoice.then((choice) => {
           if (choice.outcome === 'accepted') {
-            console.log('User accepted the install prompt.');
+            console.log("User accepted the install prompt.");
           }
           this.deferredPrompt = null;
           this.showInstallPrompt = false;
@@ -72,201 +79,143 @@ export default {
 
     // Fetch cached assets from Django REST API
     async fetchAssets() {
+      this.loading = true;
       try {
         const response = await fetch('http://localhost:8000/api/assets/');
         const data = await response.json();
         this.assets = data;
       } catch (error) {
-        alert("Failed to load assets. Is Django running?");
+        alert("❌ Failed to load assets. Is Django running?");
         console.error(error);
-      }
-    },
-
-    // Helper: Convert Base64URL string to Uint8Array
-    urlBase64ToUint8Array(base64String) {
-      const padding = '='.repeat((4 - base64String.length % 4) % 4);
-      const base64 = (base64String + padding)
-        .replace(/-/g, '+')
-        .replace(/_/g, '/');
-
-      const rawData = window.atob(base64);
-      const outputArray = new Uint8Array(rawData.length);
-
-      for (let i = 0; i < rawData.length; ++i) {
-        outputArray[i] = rawData.charCodeAt(i);
-      }
-
-      return outputArray;
-    },
-
-    // Subscribe to Push Notifications
-    async subscribeToPush() {
-      if (!('serviceWorker' in navigator)) {
-        alert("Service workers not supported.");
-        return;
-      }
-
-      const registration = await navigator.serviceWorker.ready;
-
-      const existingSubscription = await registration.pushManager.getSubscription();
-      if (existingSubscription) {
-        alert("Already subscribed!");
-        return;
-      }
-
-      try {
-        const response = await fetch('http://localhost:8000/api/get_vapid_public_key/');
-        if (!response.ok) throw new Error("Failed to load VAPID key");
-
-        const { publicKey } = await response.json();
-
-        const convertedKey = this.urlBase64ToUint8Array(publicKey);
-
-        const subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: convertedKey
-        });
-
-        // Send to backend
-        const res = await fetch('http://localhost:8000/api/save_subscribe/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(subscription),
-          credentials: 'include'
-        });
-
-        const result = await res.json();
-        console.log("Subscription saved:", result);
-        alert("✅ You're now subscribed to push notifications!");
-
-      } catch (err) {
-        console.error("Subscription failed:", err);
-        alert("❌ Failed to subscribe. Check console for details.");
+      } finally {
+        this.loading = false;
       }
     }
   }
 };
 </script>
-
 <style>
 /* Global styles */
 :root {
-  --primary-color: #42b983;
-  --secondary-color: #2c3e50;
-  --bg-color: #f5f5f5;
-  --card-bg: white;
-  --text-color: #333;
+  --primary-color: #4f46e5;     /* Indigo */
+  --secondary-color: #7c3aed;   /* Violet */
+  --accent-color: #ec4899;     /* Hot pink */
+  --bg-color: #f9f9fb;
+  --card-bg: #ffffff;
+  --text-color: #111827;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
 }
 
 body {
-  margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
 }
 
 #app {
-  max-width: 800px;
+  max-width: 900px;
   margin: auto;
-  padding: 20px;
+  padding: 2rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
 }
 
+.app-container {
+  padding: 2rem;
+  background: linear-gradient(to bottom right, #f3f4f6, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Header */
 .app-header {
   text-align: center;
-  padding: 2rem 1rem;
-  background: linear-gradient(to right, #2c3e50, #34495e);
+  padding: 2.5rem 1.5rem;
+  background: linear-gradient(to right, #7c3aed, #ec4899);
   color: white;
   border-radius: 10px;
   margin-bottom: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
 }
 
 .app-header h1 {
-  margin: 0;
-  font-size: 2rem;
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
 }
 
 .app-header p {
-  margin-top: 0.5rem;
   font-weight: 300;
+  opacity: 0.9;
 }
 
+/* Buttons */
 .action-buttons {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
   margin-bottom: 2rem;
 }
 
 .btn {
-  padding: 12px 20px;
+  padding: 14px 20px;
   font-size: 1rem;
   font-weight: bold;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: var(--shadow);
+  text-align: center;
 }
 
 .install-btn {
-  background-color: #3498db;
+  background: var(--secondary-color);
   color: white;
 }
 
 .fetch-btn {
-  background-color: #2ecc71;
+  background: var(--primary-color);
   color: white;
 }
 
 .notify-btn {
-  background-color: #e67e22;
+  background: var(--accent-color);
   color: white;
 }
 
 .btn:hover {
+  transform: translateY(-3px);
   opacity: 0.9;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-.asset-list {
-  background: var(--card-bg);
-  padding: 1.5rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.asset-list h2 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  color: var(--secondary-color);
-}
-
-.asset-card {
-  background: var(--card-bg);
-  padding: 1rem;
-  margin-bottom: 0.8rem;
-  border-left: 5px solid var(--primary-color);
-  list-style: none;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.asset-card strong {
-  display: block;
-  color: var(--secondary-color);
-}
-
-.asset-card small {
-  display: block;
-  color: #888;
-  margin-top: 0.4rem;
-}
-
-.no-assets {
+/* Spinner */
+.spinner {
   text-align: center;
-  color: #999;
-  font-style: italic;
+  color: var(--accent-color);
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+/* Footer */
+.app-footer {
+  text-align: center;
+  margin-top: auto;
+  padding: 1.5rem 0 0 0;
+  font-size: 0.9rem;
+  color: #6b7280;
 }
 </style>

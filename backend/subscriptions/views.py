@@ -34,5 +34,3 @@ def get_vapid_public_key(request):
     return JsonResponse({
         "publicKey": "BExSQxk0YU_KlG_a79QgFRMMwzILI1YohJYXtO8U03hPiREY6EbET6Y_XAH9nQm0ZdC9GUt_LwIeyNExsNE8yvE" #base64url format pas pem
     })
-
-
