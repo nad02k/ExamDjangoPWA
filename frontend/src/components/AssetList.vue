@@ -7,7 +7,7 @@
         <small>Hash: {{ asset.hash.substring(0, 10) }}...</small>
       </li>
     </ul>
-    <p v-else class="no-assets">No assets found. Click "Load Offline Assets"</p>
+    <p v-else class="no-assets">No assets found. Click "Load Cached Assets"</p>
   </section>
 </template>
 
