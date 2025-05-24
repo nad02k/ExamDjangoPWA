@@ -19,6 +19,7 @@ from graphene_django.views import GraphQLView
 from django.urls import path
 from assets.views import get_assets
 from subscriptions.views import get_vapid_public_key
+from analytics.views import GetAnalysisResults
 from subscriptions.views import save_subscription
 
 
@@ -29,6 +30,7 @@ urlpatterns = [
     path('api/assets/', get_assets, name='get_assets'),
     path('api/get_vapid_public_key/', get_vapid_public_key),
     path('api/save_subscribe/', save_subscription),
+    path('api/analysis-results/', GetAnalysisResults.as_view()),
 ]
 
 

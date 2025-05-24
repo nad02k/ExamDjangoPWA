@@ -22,10 +22,11 @@ def precache_asset(url):
 @shared_task
 def analyze_usage():
     """
-    Simulates AI-based clustering of user behavior.
-    Replace with real data later.
+    Simule une analyse AI des comportements utilisateurs.
+    Remplace par des données réelles plus tard.
     """
-    data = np.array([[5.2], [12.3], [2.1], [9.4]])  # Time spent
+    data = np.array([[5.2], [12.3], [2.1], [9.4]])  # [[temps passé]]
+    
     kmeans = KMeans(n_clusters=2).fit(data)
     labels = kmeans.labels_
 
@@ -35,5 +36,5 @@ def analyze_usage():
             description=f"User {i+1} belongs to cluster {label}"
         )
 
-    print("Saved", len(labels), "patterns")
+    print("Clusters trouvés:", labels)
     return f"{len(labels)} patterns saved"
