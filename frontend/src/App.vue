@@ -3,7 +3,7 @@
     <!-- Header -->
     <header class="app-header" role="banner">
       <h1>📚 Offline Asset Manager</h1>
-      <p>Your PWA is Ready!</p>
+      <p>Welcome to our Progressive Web Application !</p>
     </header>
 
     <!-- Main Content -->
