@@ -93,6 +93,16 @@ export default {
     }
   }
 };
+fetch('http://localhost:8000/api/analysis-results/', {
+  method: 'GET',
+  headers: {
+    'Authorization': ' Token fcdd6b25e9743adbb7e3d5e88527e22ce9664b80'
+  },
+  credentials: 'include'
+})
+.then(res => res.json())
+.then(data => console.log(data))
+.catch(err => console.error(err));
 </script>
 <style>
 /* Global styles */

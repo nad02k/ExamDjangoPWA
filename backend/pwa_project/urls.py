@@ -33,4 +33,3 @@ urlpatterns = [
     path('api/analysis-results/', GetAnalysisResults.as_view()),
 ]
 
-

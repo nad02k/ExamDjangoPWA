@@ -21,10 +21,6 @@ def precache_asset(url):
 
 @shared_task
 def analyze_usage():
-    """
-    Simule une analyse AI des comportements utilisateurs.
-    Remplace par des données réelles plus tard.
-    """
     data = np.array([[5.2], [12.3], [2.1], [9.4]])  # [[temps passé]]
     
     kmeans = KMeans(n_clusters=2).fit(data)
@@ -37,4 +33,4 @@ def analyze_usage():
         )
 
     print("Clusters trouvés:", labels)
-    return f"{len(labels)} patterns saved"
+    return {"clusters": labels.tolist()}
