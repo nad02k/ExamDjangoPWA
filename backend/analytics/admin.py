@@ -3,5 +3,6 @@ from .models import UsagePattern
 
 @admin.register(UsagePattern)
 class UsagePatternAdmin(admin.ModelAdmin):
-    list_display = ('cluster_id', 'timestamp')
-    readonly_fields = ('cluster_id', 'description', 'timestamp')
+    list_display = ('id', 'cluster_id', 'description', 'timestamp')
+    list_filter = ('cluster_id',)
+    search_fields = ('description',)
