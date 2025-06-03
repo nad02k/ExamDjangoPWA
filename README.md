@@ -1,26 +1,89 @@
-# 📦 Offline Asset Manager PWA
+📦 Offline Asset Manager – PWA
+🛠️ Django + Vue.js + Celery + Redis + scikit-learn
+🎓 SESAME University | 3ING Web Programming in Python
+👨‍🏫 Supervised by Mr. Chaouki Bayoudhi
+📅 Academic Year 2024–2025
 
-A Progressive Web App (PWA) that caches assets for offline use, analyzes user behavior with AI, and sends push notifications using Celery and Redis.
+🎯 Project Overview
+This is a Progressive Web Application (PWA) that:
 
----
+✅ Caches assets offline using a service worker
 
-## 🔧 Features
+✅ Lets users install the app on their device
 
-- ✅ Django backend with offline asset caching
-- ✅ Vue.js frontend with install prompt and service worker
-- ✅ Background jobs powered by Celery + Redis
-- ✅ AI-based usage analytics (KMeans clustering)
-- ✅ GraphQL API for querying cached assets
-- ✅ REST endpoints for asset management
-- ✅ Push notifications via VAPID key
+✅ Uses AI-based analytics to group users into clusters with scikit-learn KMeans
 
----
+✅ Sends push notifications via VAPID with subscription checks
 
-## 📋 Requirements
+✅ Runs background tasks asynchronously using Celery + Redis
 
-Make sure you have Python 3.10+ and Node.js installed.
+✅ Exposes data through REST + GraphQL APIs
 
-### Backend (Django)
+🧠 What’s Inside
+🔍 AI Analytics
+Clusters users using scikit-learn’s KMeans
 
-```bash
-pip install django djangorestframework celery redis scikit-learn billiard graphene-django django-cors-headers
+Behavior analysis runs in background tasks with Celery
+
+🌐 API Support
+REST API via Django REST Framework
+
+GraphQL API via Graphene-Django
+
+Serializers include custom validation
+
+🔐 Security
+Token-based authentication 
+
+Role-based access control
+
+Configured CORS and CSRF
+
+🔄 Celery + Redis
+Handles background async jobs
+
+Redis message broker
+
+🔔 Push Notifications
+Uses VAPID protocol
+
+When enabling notifications, checks subscription status
+
+Prevents duplicate subscriptions
+
+💻 Frontend – Vue.js
+Built with Vue.js for a responsive user interface
+
+Implements Progressive Web App standards
+
+Uses service workers to cache assets for offline use
+
+Provides UI for:
+
+Installing the app on desktop and mobile
+
+Managing push notification subscriptions
+
+📲 PWA Features
+Offline asset caching with service workers ensures fast load and offline use
+
+Installable on mobile and desktop devices
+
+Push notifications with subscription management to avoid duplicates
+
+
+⚙️ How to Run It
+📁 1. Clone the Repository
+git clone <https://github.com/nad02k/ExamDjangoPWA.git>
+🐍 2. Setup Backend (Django)
+python -m venv venv
+Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py createsuperuser
+🌐 3. Setup Frontend (Vue.js)
+cd frontend
+npm install
+npm run build
+▶️ 4. Run the Application
+python manage.py runserver
